@@ -1,0 +1,8 @@
+boto3
+bs4
+jupyter
+nltk
+pandas
+sagemaker
+scikit-learn
+tqdm

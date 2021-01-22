@@ -1,22 +1,19 @@
 import csv
-import glob
-import logging
 import multiprocessing
 import os
 import string
-from itertools import chain
 from multiprocessing import Pool
 from random import shuffle, seed
 from typing import Tuple, List
 
-import boto3
 import nltk
-from botocore.exceptions import ClientError
 from bs4 import BeautifulSoup
+from itertools import chain
 from nltk.corpus import stopwords
 from tqdm.auto import tqdm
 
 from imdb.blz.config import train_file, s3_bucket, validation_file
+from imdb.data import load_reviews, upload_to_s3
 
 contractions = {
     "aren't": "are not",
@@ -136,18 +133,6 @@ contractions = {
 }
 
 
-def load_reviews(data_dir: str) -> List[Tuple[str, int]]:
-    reviews = []
-
-    for sentiment in ['pos', 'neg']:
-        files_path = os.path.join(data_dir, sentiment, '*.txt')
-        for f in glob.glob(files_path):
-            with open(f) as review:
-                reviews.append((review.read().strip(), 1 if sentiment == 'pos' else 0))
-
-    return reviews
-
-
 def to_blz_format(data_row: Tuple[str, int]) -> List[str]:
     review, label = data_row
     review = BeautifulSoup(review, 'html.parser').get_text()  # Remove HTML tags
@@ -176,18 +161,6 @@ def create_input_file(reviews: List[Tuple[str, int]], output_file: str) -> str:
         csv_writer.writerows(transformed_rows)
 
     return output_file
-
-
-def upload_to_s3(file_name, bucket, object_name=None, s3_client=boto3.client('s3')):
-    if object_name is None:
-        object_name = file_name
-
-    try:
-        s3_client.upload_file(file_name, bucket, object_name)
-    except ClientError as e:
-        logging.error(e)
-        return False
-    return True
 
 
 nltk.download('stopwords')

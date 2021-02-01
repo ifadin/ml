@@ -7,7 +7,7 @@ from sagemaker.inputs import ShuffleConfig
 from sagemaker.parameter import IntegerParameter, ContinuousParameter
 from sagemaker.tuner import HyperparameterTuner
 
-from imdb.blz.config import s3_bucket, iam_role, train_file, validation_file
+from imdb.blz.config import s3_bucket, iam_role, train_file, test_file
 
 
 def get_algorithm_image_uri(alg_name: str, region_name: str) -> str:
@@ -66,6 +66,6 @@ e.set_hyperparameters(mode='supervised',
 e.fit({
     'train': TrainingInput(f's3://{s3_bucket}/{train_file}',
                            content_type='text/plain', shuffle_config=ShuffleConfig(randint(0, 1000))),
-    'validation': TrainingInput(f's3://{s3_bucket}/{validation_file}',
+    'validation': TrainingInput(f's3://{s3_bucket}/{test_file}',
                                 content_type='text/plain')
 })

@@ -1,16 +1,17 @@
 # ML Notebooks
 
 Setup:
+
 ```shell script
     make init
 ```
-
 
 ## Sentiment analysis
 
 ### DBPedia
 
-[Blazingtext](https://github.com/aws/amazon-sagemaker-examples/blob/master/introduction_to_amazon_algorithms/blazingtext_text_classification_dbpedia/blazingtext_text_classification_dbpedia.ipynb).
+[Blazingtext](https://github.com/aws/amazon-sagemaker-examples/blob/master/introduction_to_amazon_algorithms/blazingtext_text_classification_dbpedia/blazingtext_text_classification_dbpedia.ipynb)
+.
 
 ### IMDB
 
@@ -27,18 +28,47 @@ Unpack data:
 ```
 
 Prepare data (cleanup, contractions expansion, lemmatization):
+
 ```shell script
     source setup.rc
     python -m imdb.blz.prepare_data
 ```
 
 Train model:
+
 ```shell script
     python -m imdb.blz.train_model
 ```
 
+#### PyTorch with LSTM
 
-## Jupyter 
+Extract IMDB dataset to `imdb/data`.
+
+Activate virtual env:
+
+```shell
+    source setup.rc
+```
+
+Format data (tokens to indices):
+
+```shell
+    python3 -m imdb.pyt.prepare_data
+```
+
+Train locally:
+
+```shell
+    python3 imdb/pyt/code/train.py --epochs=5
+```
+
+On SageMaker:
+
+```shell
+    python3 -m imdb.pyt.run --epochs=5
+```
+
+## Jupyter
 
 ```shell script
     jupyter notebook --ip=0.0.0.0 --port=8080

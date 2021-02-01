@@ -2,17 +2,17 @@ import csv
 import multiprocessing
 import os
 import string
+from itertools import chain
 from multiprocessing import Pool
 from random import shuffle, seed
 from typing import Tuple, List
 
 import nltk
 from bs4 import BeautifulSoup
-from itertools import chain
 from nltk.corpus import stopwords
 from tqdm.auto import tqdm
 
-from imdb.blz.config import train_file, s3_bucket, validation_file
+from imdb.blz.config import train_file, s3_bucket, test_file
 from imdb.data import load_reviews, upload_to_s3
 
 contractions = {
@@ -168,13 +168,13 @@ nltk.download('wordnet')
 seed(1234)
 
 train_reviews = load_reviews(os.path.join('imdb', 'data', 'train'))
-test_reviews = load_reviews(os.path.join('imdb', 'data', 'test'))
-shuffle(test_reviews)
-validation_reviews, additional_train_reviews = (test_reviews[:len(test_reviews) // 2],
-                                                test_reviews[len(test_reviews) // 2:])
+test_data = load_reviews(os.path.join('imdb', 'data', 'test'))
+shuffle(test_data)
+test_reviews, additional_train_reviews = (test_data[:len(test_data) // 2],
+                                          test_data[len(test_data) // 2:])
 
 create_input_file(train_reviews + additional_train_reviews, train_file)
 upload_to_s3(train_file, s3_bucket)
 
-create_input_file(validation_reviews, validation_file)
-upload_to_s3(validation_file, s3_bucket)
+create_input_file(test_reviews, test_file)
+upload_to_s3(test_file, s3_bucket)
